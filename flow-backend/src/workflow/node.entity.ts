@@ -15,6 +15,9 @@ export class Node {
   @Column()
   type: string;
 
+  @Column('json')
+  config: any;
+
   @ManyToOne(() => Workflow, (workflow) => workflow.nodes, {
     onDelete: 'CASCADE', // Ensures all nodes are deleted if the workflow is deleted
   })

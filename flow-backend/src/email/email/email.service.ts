@@ -12,12 +12,12 @@ export class EmailService {
     },
   });
 
-  async sendEmail(to: string, subject: string, text: string) {
+  async sendEmail(config: { to: string; subject: string; text: string }) {
     const mailOptions = {
       from: 'your-email@gmail.com',
-      to: to,
-      subject: subject,
-      text: text,
+      to: config.to,
+      subject: config.subject,
+      text: config.text,
     };
     await this.transporter.sendMail(mailOptions);
   }

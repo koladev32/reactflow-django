@@ -10,6 +10,7 @@ import { Workflow } from './workflow/workflow.entity';
 import { Edge } from './workflow/node.entity';
 import { Node } from './workflow/node.entity';
 import { WorkflowModule } from './workflow/workflow.module';
+import { CallbackModule } from './callback/callback.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { WorkflowModule } from './workflow/workflow.module';
       entities: [Workflow, Node, Edge],
     }),
     WorkflowModule,
+    CallbackModule,
   ],
   controllers: [AppController],
   providers: [AppService],

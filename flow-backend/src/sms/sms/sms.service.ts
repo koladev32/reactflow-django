@@ -9,10 +9,10 @@ export class SmsService {
     'TWILIO_AUTH_TOKEN',
   );
 
-  sendSms(to: string, message: string) {
+  sendSms(config: { to: string; message: string }) {
     this.twilioClient.messages.create({
-      body: message,
-      to: to,
+      body: config.message,
+      to: config.to,
       from: '+12345678901', // Your Twilio number
     });
   }
