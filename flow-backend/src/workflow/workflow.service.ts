@@ -52,6 +52,18 @@ export class NodeService {
   async getNodeById(nodeId: number): Promise<Node> {
     return await this.nodeRepository.findOneBy({ id: nodeId });
   }
+
+  async findWorkflowByWebhookId(webhookId: string): Promise<Workflow | null> {
+    const node = await this.nodeRepository.findOne({
+      where: {
+        type: 'webhook', // Assuming 'webhook' is the type for trigger nodes
+        config: { webhookId: webhookId },
+      },
+      relations: ['workflow'],
+    });
+
+    return node ? node.workflow : null;
+  }
 }
 
 @Injectable()
