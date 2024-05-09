@@ -7,8 +7,10 @@ import { Edge, Node } from './node.entity';
 import { FlowExecutorService } from './flow-executor/flow-executor.service';
 import { EmailModule } from '../email/email.module';
 import { SmsModule } from '../sms/sms.module';
-import { WebhookModule } from '../webhook/webhook.module';
 import { CallbackModule } from '../callback/callback.module';
+import { WorkflowController } from './controllers/workflow/workflow.controller';
+import { NodeController } from './controllers/node/node.controller';
+import { EdgeController } from './controllers/edge/edge.controller';
 
 @Module({
   imports: [
@@ -16,9 +18,9 @@ import { CallbackModule } from '../callback/callback.module';
     EmailModule,
     SmsModule,
     CallbackModule,
-    WebhookModule,
   ],
   providers: [WorkflowService, EdgeService, NodeService, FlowExecutorService],
-  exports: [WorkflowService, EdgeService, NodeService, FlowExecutorService], // Export the service if it needs to be used outside this module
+  exports: [WorkflowService, EdgeService, NodeService, FlowExecutorService],
+  controllers: [WorkflowController, NodeController, EdgeController], // Export the service if it needs to be used outside this module
 })
 export class WorkflowModule {}

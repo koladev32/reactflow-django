@@ -13,6 +13,9 @@ export class EmailService {
   });
 
   async sendEmail(config: { to: string; subject: string; text: string }) {
+    console.log(config);
+    console.log('Data sent');
+    return;
     const mailOptions = {
       from: 'your-email@gmail.com',
       to: config.to,

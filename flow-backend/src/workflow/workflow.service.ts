@@ -14,14 +14,47 @@ export class WorkflowService {
   ) {}
 
   async createWorkflow(dto: WorkflowDTO): Promise<Workflow> {
-    const workflow = this.workflowRepository.create(dto);
-    return this.workflowRepository.save(workflow);
+    const workflow = await this.workflowRepository.create(dto);
+    return await this.workflowRepository.save(workflow);
+  }
+
+  async getAllWorkflows(): Promise<Workflow[]> {
+    return await this.workflowRepository.find({
+      relations: ['nodes', 'nodes.outgoingEdges', 'nodes.incomingEdges'],
+    });
   }
 
   async getWorkflowById(workflowId: number): Promise<Workflow> {
-    return await this.workflowRepository.findOneBy({
-      id: workflowId,
+    return await this.workflowRepository.findOne({
+      where: {
+        id: workflowId,
+      },
+      relations: ['nodes', 'nodes.outgoingEdges', 'nodes.incomingEdges'],
     });
+  }
+
+  async getWorkflowForReactFlow(id: number): Promise<any> {
+    const workflow = await this.getWorkflowById(id);
+    if (!workflow) return null;
+
+    const nodes = workflow.nodes.map((node) => ({
+      id: String(node.id),
+      type: node.type,
+      data: { label: `${node.type} Node`, ...node.config },
+      position: { x: Math.random() * 400, y: Math.random() * 400 }, // Random for example, should be calculated or fixed
+    }));
+
+    const edges = workflow.nodes.flatMap((node) =>
+      node.outgoingEdges.map((edge) => ({
+        id: String(edge.id),
+        source: edge.sourceNode ? edge.sourceNode?.id : null,
+        target: edge.targetNode ? edge.targetNode?.id : null,
+        animated: true,
+        label: 'Edge',
+      })),
+    );
+
+    return { name: workflow.name, nodes, edges };
   }
 }
 
@@ -34,10 +67,9 @@ export class NodeService {
   ) {}
 
   async createNode(dto: NodeDTO): Promise<Node> {
+    let workflow;
     if (dto.workflowId) {
-      const workflow = await this.workflowService.getWorkflowById(
-        dto.workflowId,
-      );
+      workflow = await this.workflowService.getWorkflowById(dto.workflowId);
       if (!workflow) {
         throw new NotFoundException(
           `Workflow with ID ${dto.workflowId} not found`,
@@ -45,8 +77,15 @@ export class NodeService {
       }
     }
 
-    const node = this.nodeRepository.create(dto);
-    return this.nodeRepository.save(node);
+    const node = this.nodeRepository.create({
+      ...dto,
+      workflow: workflow,
+    });
+    await this.nodeRepository.save(node);
+    return await this.nodeRepository.findOne({
+      where: { id: node.id },
+      relations: ['workflow'], // Ensure the workflow is loaded
+    });
   }
 
   async getNodeById(nodeId: number): Promise<Node> {
@@ -89,12 +128,12 @@ export class EdgeService {
       );
     }
 
-    const edge = this.edgeRepository.create({
+    const edge = await this.edgeRepository.create({
       ...dto,
       sourceNode: sourceNode,
       targetNode: targetNode,
     });
-    return this.edgeRepository.save(edge);
+    return await this.edgeRepository.save(edge);
   }
 
   // Method to fetch edges by source node ID

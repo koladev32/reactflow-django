@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  IsNull,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -15,18 +16,19 @@ export class Node {
   @Column()
   type: string;
 
-  @Column('json')
+  @Column('json', { nullable: true })
   config: any;
 
   @ManyToOne(() => Workflow, (workflow) => workflow.nodes, {
     onDelete: 'CASCADE', // Ensures all nodes are deleted if the workflow is deleted
+    eager: true,
   })
   workflow: Workflow;
 
-  @OneToMany(() => Edge, (edge) => edge.sourceNode)
+  @OneToMany(() => Edge, (edge) => edge.sourceNode, { eager: true })
   outgoingEdges: Edge[];
 
-  @OneToMany(() => Edge, (edge) => edge.targetNode)
+  @OneToMany(() => Edge, (edge) => edge.targetNode, { eager: true })
   incomingEdges: Edge[];
 }
 

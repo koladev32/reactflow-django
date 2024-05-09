@@ -4,6 +4,7 @@ import { EmailService } from '../../email/email/email.service';
 import { SmsService } from '../../sms/sms/sms.service';
 import { Node } from '../node.entity';
 import { CallbackService } from '../../callback/callback/callback.service';
+import { NodeType } from '../enums';
 
 @Injectable()
 export class FlowExecutorService {

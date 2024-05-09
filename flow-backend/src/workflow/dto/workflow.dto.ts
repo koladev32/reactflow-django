@@ -1,4 +1,6 @@
 import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { Workflow } from '../workflow.entity';
+import { READONLY } from 'sqlite3';
 
 export class WorkflowDTO {
   @IsString()

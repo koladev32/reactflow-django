@@ -10,6 +10,9 @@ export class SmsService {
   );
 
   sendSms(config: { to: string; message: string }) {
+    console.log(config);
+    console.log('Data sent SMS');
+    return;
     this.twilioClient.messages.create({
       body: config.message,
       to: config.to,
