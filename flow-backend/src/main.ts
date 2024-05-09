@@ -1,52 +1,59 @@
-// src/main.ts or a separate script file
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {
-  EdgeService,
-  NodeService,
-  WorkflowService,
-} from './workflow/workflow.service';
+import { EdgeService, NodeService } from './workflow/workflow.service';
 import { FlowExecutorService } from './workflow/flow-executor/flow-executor.service';
 
 async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule);
-  const workflowService = app.get(WorkflowService);
+  const app = await NestFactory.create(AppModule);
   const nodeService = app.get(NodeService);
   const edgeService = app.get(EdgeService);
-  const executorService = app.get(FlowExecutorService);
-
-  // Create a workflow
-  const workflow = await workflowService.createWorkflow({
-    name: 'Sample Workflow',
-  });
+  const flowExecutorService = app.get(FlowExecutorService);
 
   // Create nodes
-  const node1 = await nodeService.createNode({
-    type: 'start',
-    workflowId: workflow.id,
+  const webhookNode = await nodeService.createNode({
+    type: 'webhook',
+    config: { webhookId: 'startWorkflow123' },
   });
-  const node2 = await nodeService.createNode({
-    type: 'process',
-    workflowId: workflow.id,
+  const emailNode = await nodeService.createNode({
+    type: 'email',
+    config: {
+      to: '{{email}}', // Placeholder to be replaced with actual email from trigger data
+      subject: 'Hello from the Workflow',
+      body: '{{message}}', // Placeholder to be replaced with actual message from trigger data
+    },
   });
-  const node3 = await nodeService.createNode({
-    type: 'end',
-    workflowId: workflow.id,
+  const smsNode = await nodeService.createNode({
+    type: 'sms',
+    config: {
+      phoneNumber: '{{phone}}', // Placeholder to be replaced with actual phone number from trigger data
+      message: 'Your process is complete.',
+    },
   });
 
   // Create edges
   await edgeService.createEdge({
-    sourceNodeId: node1.id,
-    targetNodeId: node2.id,
+    sourceNodeId: webhookNode.id,
+    targetNodeId: emailNode.id,
   });
   await edgeService.createEdge({
-    sourceNodeId: node2.id,
-    targetNodeId: node3.id,
+    sourceNodeId: emailNode.id,
+    targetNodeId: smsNode.id,
   });
 
-  // Execute the workflow from the start node
-  await executorService.executeWorkflow(node1.id);
+  // Simulate incoming webhook data
+  const triggerData = {
+    email: 'user@example.com',
+    phone: '+12345678901',
+    message: 'This is a test message from webhook',
+  };
 
+  // Execute the workflow
+  await flowExecutorService.executeWorkflowFromStartNode(
+    webhookNode.id,
+    triggerData,
+  );
+
+  console.log('Workflow executed successfully!');
   await app.close();
 }
 

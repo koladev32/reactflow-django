@@ -5,9 +5,19 @@ import { EdgeService, NodeService, WorkflowService } from './workflow.service';
 import { Workflow } from './workflow.entity';
 import { Edge, Node } from './node.entity';
 import { FlowExecutorService } from './flow-executor/flow-executor.service';
+import { EmailModule } from '../email/email.module';
+import { SmsModule } from '../sms/sms.module';
+import { WebhookModule } from '../webhook/webhook.module';
+import { CallbackModule } from '../callback/callback.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Workflow, Node, Edge])],
+  imports: [
+    TypeOrmModule.forFeature([Workflow, Node, Edge]),
+    EmailModule,
+    SmsModule,
+    CallbackModule,
+    WebhookModule,
+  ],
   providers: [WorkflowService, EdgeService, NodeService, FlowExecutorService],
   exports: [WorkflowService, EdgeService, NodeService, FlowExecutorService], // Export the service if it needs to be used outside this module
 })

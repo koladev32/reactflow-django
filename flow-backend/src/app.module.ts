@@ -11,6 +11,7 @@ import { Edge } from './workflow/node.entity';
 import { Node } from './workflow/node.entity';
 import { WorkflowModule } from './workflow/workflow.module';
 import { CallbackModule } from './callback/callback.module';
+import { WebhookController } from './webhook/webhook/webhook.controller';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { CallbackModule } from './callback/callback.module';
     WorkflowModule,
     CallbackModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, WebhookController],
   providers: [AppService],
 })
 export class AppModule {}

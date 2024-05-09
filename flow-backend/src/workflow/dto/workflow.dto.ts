@@ -11,6 +11,10 @@ export class NodeDTO {
   @IsNotEmpty()
   type: string;
 
+  @IsString()
+  @IsOptional()
+  config: any;
+
   @IsNumber()
   @IsOptional()
   workflowId?: number; // Optional to associate during creation or modification
