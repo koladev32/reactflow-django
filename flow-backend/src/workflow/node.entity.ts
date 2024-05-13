@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  IsNull,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -30,6 +29,9 @@ export class Node {
 
   @OneToMany(() => Edge, (edge) => edge.targetNode, { eager: true })
   incomingEdges: Edge[];
+
+  @Column('json')
+  position: { x: number; y: number };
 }
 
 @Entity()
@@ -42,4 +44,7 @@ export class Edge {
 
   @ManyToOne(() => Node, (node) => node.incomingEdges, { onDelete: 'CASCADE' })
   targetNode: Node;
+
+  @Column({ nullable: true })
+  label: string;
 }

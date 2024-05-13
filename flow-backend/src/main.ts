@@ -6,10 +6,10 @@ import {
   WorkflowService,
 } from './workflow/workflow.service';
 import { FlowExecutorService } from './workflow/flow-executor/flow-executor.service';
-import { Workflow } from './workflow/workflow.entity';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   const nodeService = app.get(NodeService);
   const workflowService = app.get(WorkflowService);
   const edgeService = app.get(EdgeService);
@@ -44,16 +44,14 @@ async function bootstrap() {
   });
 
   // Create edges
-  const ed = await edgeService.createEdge({
+  await edgeService.createEdge({
     sourceNodeId: webhookNode.id,
     targetNodeId: emailNode.id,
   });
-  const e = await edgeService.createEdge({
+  await edgeService.createEdge({
     sourceNodeId: emailNode.id,
     targetNodeId: smsNode.id,
   });
-
-  console.log(ed, e);
 
   // Simulate incoming webhook data
   const triggerData = {

@@ -29,7 +29,12 @@ export class WorkflowService {
       where: {
         id: workflowId,
       },
-      relations: ['nodes', 'nodes.outgoingEdges', 'nodes.incomingEdges'],
+      relations: [
+        'nodes',
+        'nodes.outgoingEdges',
+        'nodes.outgoingEdges.sourceNode',
+        'nodes.outgoingEdges.targetNode',
+      ],
     });
   }
 
@@ -41,16 +46,21 @@ export class WorkflowService {
       id: String(node.id),
       type: node.type,
       data: { label: `${node.type} Node`, ...node.config },
-      position: { x: Math.random() * 400, y: Math.random() * 400 }, // Random for example, should be calculated or fixed
+      position: node.position || {
+        x: Math.random() * 400,
+        y: Math.random() * 400,
+      }, // Random for example, should be calculated or fixed
     }));
+
+    console.log(workflow.nodes[0]);
 
     const edges = workflow.nodes.flatMap((node) =>
       node.outgoingEdges.map((edge) => ({
-        id: String(edge.id),
-        source: edge.sourceNode ? edge.sourceNode?.id : null,
-        target: edge.targetNode ? edge.targetNode?.id : null,
+        id: edge.id,
+        source: edge.sourceNode ? String(edge.sourceNode?.id) : null,
+        target: edge.targetNode ? String(edge.targetNode?.id) : null,
         animated: true,
-        label: 'Edge',
+        label: edge.label,
       })),
     );
 
